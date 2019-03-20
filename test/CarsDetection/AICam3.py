@@ -11,6 +11,9 @@ net.setPreferableTarget(cv.dnn.DNN_TARGET_MYRIAD)
 # Read an image
 cap = cv.VideoCapture(0)
 
+#image dimension
+heigh = 640
+width = 1280
 
 while(True):
     # Start time
@@ -39,7 +42,7 @@ while(True):
 
 
     # resize the image
-    frame = cv.resize(frame,(1280,640))
+    frame = cv.resize(frame,(width,heigh))
 
 
     #end time
@@ -47,7 +50,9 @@ while(True):
 
     # Time elapsed
     seconds = end - start
-    print ("Time taken : {0} seconds").format(seconds)
+    fps = seconds / 60
+
+    cv.putText(frame, "FPS : {0:.2f} ".format(str), (10,10), cv.FONT_HERSHEY_COMPLEX, 3, (0,0,0), thickness = 5)
     
 
     # Display the resulting frame
