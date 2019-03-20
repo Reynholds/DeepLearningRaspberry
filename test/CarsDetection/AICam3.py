@@ -33,13 +33,14 @@ while(True):
         ymin = int(detection[4] * frame.shape[0])
         xmax = int(detection[5] * frame.shape[1])
         ymax = int(detection[6] * frame.shape[0])
-        if confidence > 0.5 :
-           cv.rectangle(frame, (xmin, ymin), (xmax, ymax), color=(0, 0, 255), thickness=5)
-        elif confidence > 0.3 :
-           cv.rectangle(frame, (xmin, ymin), (xmax, ymax), color=(255,0,0), thickness=5)
-        elif confidence > 0.05 :
-           cv.rectangle(frame,(xmin, ymin) , (xmax, ymax), color=(0,255,0), thickness=5)
 
+        if confidence > 0.5 :
+           cv.rectangle(frame, (xmin, ymin), (xmax, ymax), color=(0, 0, 255), thickness=3)
+        elif confidence > 0.3 :
+           cv.rectangle(frame, (xmin, ymin), (xmax, ymax), color=(255,0,0), thickness=2)
+        elif confidence > 0.05 :
+           cv.rectangle(frame,(xmin, ymin) , (xmax, ymax), color=(0,255,0), thickness=1)
+           
 
     # resize the image
     frame = cv.resize(frame,(width,heigh))
@@ -50,9 +51,9 @@ while(True):
 
     # Time elapsed
     seconds = end - start
-    fps = seconds / 60
+    fps = 1 / seconds
 
-    cv.putText(frame, "FPS : {0:.2f} ".format(fps), (30,10), cv.FONT_HERSHEY_COMPLEX, 1, (0,0,0))
+    cv.putText(frame, "FPS : {0:.2f} ".format(fps), (30,30), cv.FONT_HERSHEY_COMPLEX, 1, (0,0,0))
     
 
     # Display the resulting frame
