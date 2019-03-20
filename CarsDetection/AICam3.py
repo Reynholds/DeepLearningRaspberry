@@ -52,7 +52,7 @@ while(True):
     seconds = end - start
     fps = seconds / 60
 
-    cv.putText(frame, "FPS : {0:.2f} ".format(fps), (30,10), cv.FONT_HERSHEY_COMPLEX, 1, (0,0,0))
+    cv.putText(frame, "FPS : {0:.2f} ".format(str), (10,10), cv.FONT_HERSHEY_COMPLEX, 3, (0,0,0), thickness = 5)
     
 
     # Display the resulting frame
