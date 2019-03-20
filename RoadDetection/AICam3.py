@@ -2,11 +2,12 @@ import numpy as np
 import cv2 as cv
 import time
 
+
 # dotted rectangle https://stackoverflow.com/questions/26690932/opencv-rectangle-with-dotted-or-dashed-lines 
 
 
 # Load the Model 
-net = cv.dnn.readNet('person-vehicle-bike-detection-crossroad-0078-FP32.xml', 'person-vehicle-bike-detection-crossroad-0078-FP32.bin')
+net = cv.dnn.readNet('person-vehicle-bike-detection-crossroad-0078.xml', 'person-vehicle-bike-detection-crossroad-0078.bin')
 
 # Specify target device
 net.setPreferableTarget(cv.dnn.DNN_TARGET_MYRIAD)
@@ -21,8 +22,12 @@ width = 1280
 blue = (255,0,0)
 green = (0,255,0)
 red = (0,0,255)
+white = (255,255,255)
+black = (0,0,0)
 
-ColorDetection =[blue, green, red]
+label = ("Vehicule","Pieton","Voiture")
+
+ColorDetection =[blue, green, red, white, black]
 
 while(True):
     # Start time
@@ -31,7 +36,7 @@ while(True):
     ret, frame = cap.read()
 
     # Prepare input blob and perform an inference
-    blob = cv.dnn.blobFromImage(frame, size=(672, 384), ddepth=cv.CV_8U)
+    blob = cv.dnn.blobFromImage(frame, size=(1024,1024), ddepth=cv.CV_8U)
     net.setInput(blob)
     out= net.forward()
 
@@ -44,11 +49,12 @@ while(True):
         ymax = int(detection[6] * frame.shape[0])
 		
         if confidence > 0.5 :
-           cv.rectangle(frame, (xmin, ymin), (xmax, ymax), ColorDetection[detection[1]], thickness=5)
+           cv.rectangle(frame, (xmin, ymin), (xmax, ymax), ColorDetection[1], thickness=5)
+           print("ID {0} , label : {1} - {2}, confidence : {3:.2f} ".format(detection[0], detection[1], label[int(detection[1])], detection[2]*100)) 
         elif confidence > 0.3 :
-           cv.rectangle(frame, (xmin, ymin), (xmax, ymax), ColorDetection[detection[1]], thickness=2)
+           cv.rectangle(frame, (xmin, ymin), (xmax, ymax), ColorDetection[2], thickness=2)
         elif confidence > 0.05 :
-           cv.rectangle(frame,(xmin, ymin) , (xmax, ymax), ColorDetection[detection[1]], thickness=1)
+           cv.rectangle(frame,(xmin, ymin) , (xmax, ymax), ColorDetection[3], thickness=1)
 
 
     # resize the image
@@ -62,7 +68,7 @@ while(True):
     seconds = end - start
     fps = 1 / seconds 
 
-    cv.putText(frame, "FPS : {0:.2f} ".format(str), (30,30), cv.FONT_HERSHEY_COMPLEX, 3, (0,0,0), thickness = 5)
+    cv.putText(frame, "FPS : {0:.2f} ".format(fps), (30,30), cv.FONT_HERSHEY_COMPLEX, 1, (0,0,0), thickness = 1)
     
 
     # Display the resulting frame
