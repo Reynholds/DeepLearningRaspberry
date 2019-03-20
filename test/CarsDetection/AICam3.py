@@ -1,5 +1,6 @@
 import numpy as np
 import cv2 as cv
+import time
 
 # Load the Model 
 net = cv.dnn.readNet('pedestrian-and-vehicle-detector-adas-0001.xml', 'pedestrian-and-vehicle-detector-adas-0001.bin')
@@ -12,6 +13,8 @@ cap = cv.VideoCapture(0)
 
 
 while(True):
+    # Start time
+    start = time.time() 
     # Capture frame-by-frame
     ret, frame = cap.read()
 
@@ -37,6 +40,15 @@ while(True):
 
     # resize the image
     frame = cv.resize(frame,(1280,640))
+
+
+    #end time
+    end = time.time()
+
+    # Time elapsed
+    seconds = end - start
+    print ("Time taken : {0} seconds").format(seconds)
+    
 
     # Display the resulting frame
     cv.imshow('AI Cam', frame)
