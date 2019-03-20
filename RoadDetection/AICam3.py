@@ -6,7 +6,7 @@ import time
 
 
 # Load the Model 
-net = cv.dnn.readNet('person-vehicle-bike-detection-crossroad-0078.xml', 'person-vehicle-bike-detection-crossroad-0078.bin')
+net = cv.dnn.readNet('person-vehicle-bike-detection-crossroad-0078-FP32.xml', 'person-vehicle-bike-detection-crossroad-0078-FP32.bin')
 
 # Specify target device
 net.setPreferableTarget(cv.dnn.DNN_TARGET_MYRIAD)
@@ -60,9 +60,9 @@ while(True):
 
     # Time elapsed
     seconds = end - start
-    fps = seconds / 60
+    fps = 1 / seconds 
 
-    cv.putText(frame, "FPS : {0:.2f} ".format(str), (10,10), cv.FONT_HERSHEY_COMPLEX, 3, (0,0,0), thickness = 5)
+    cv.putText(frame, "FPS : {0:.2f} ".format(str), (30,30), cv.FONT_HERSHEY_COMPLEX, 3, (0,0,0), thickness = 5)
     
 
     # Display the resulting frame
