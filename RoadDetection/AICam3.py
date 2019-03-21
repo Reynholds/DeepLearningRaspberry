@@ -47,13 +47,13 @@ while(True):
         ymin = int(detection[4] * frame.shape[0])
         xmax = int(detection[5] * frame.shape[1])
         ymax = int(detection[6] * frame.shape[0])
-
-        if confidence > 0.6 :
+		
+        if confidence > 0.5 :
            cv.rectangle(frame, (xmin, ymin), (xmax, ymax), ColorDetection[1], thickness=5)
-           # print("ID {0} , label : {1} - {2}, confidence : {3:.2f} ".format(detection[0], detection[1], label[int(detection[1])], detection[2]*100)) 
-        elif confidence > 0.35 :
+           print("ID {0} , label : {1} - {2}, confidence : {3:.2f} ".format(detection[0], detection[1], label[int(detection[1])], detection[2]*100)) 
+        elif confidence > 0.3 :
            cv.rectangle(frame, (xmin, ymin), (xmax, ymax), ColorDetection[2], thickness=2)
-        elif confidence > 0.15 :
+        elif confidence > 0.05 :
            cv.rectangle(frame,(xmin, ymin) , (xmax, ymax), ColorDetection[3], thickness=1)
 
 
