@@ -15,9 +15,6 @@ cap = cv.VideoCapture(0)
 width = 1280
 heigh = 640
 
-#image dimension
-width = 1280
-heigh = 640
 
 blue = (255,0,0)
 green = (0,255,0)
@@ -49,12 +46,12 @@ while(True):
         ymax = int(detection[6] * frame.shape[0])
 
         if confidence > 0.6 :
-           cv.rectangle(frame, (xmin, ymin), (xmax, ymax), ColorDetection[1], thickness=5)
-           # print("ID {0} , label : {1} - {2}, confidence : {3:.2f} ".format(detection[0], detection[1], label[int(detection[1])], detection[2]*100)) 
+           cv.rectangle(frame, (xmin, ymin), (xmax, ymax), ColorDetection[int(detection[1])], thickness=5)
+           #print("ID {0} , label : {1} - {2}, confidence : {3:.2f} ".format(detection[0], detection[1], label[int(detection[1])], detection[2]*100)) 
         elif confidence > 0.35 :
-           cv.rectangle(frame, (xmin, ymin), (xmax, ymax), ColorDetection[2], thickness=2)
+           cv.rectangle(frame, (xmin, ymin), (xmax, ymax), ColorDetection[int(detection[1])], thickness=2)
         elif confidence > 0.15 :
-           cv.rectangle(frame,(xmin, ymin) , (xmax, ymax), ColorDetection[3], thickness=1)
+           cv.rectangle(frame,(xmin, ymin) , (xmax, ymax), ColorDetection[int(detection[1])], thickness=1)
    
 
     # resize the image
