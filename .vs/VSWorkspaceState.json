@@ -1,9 +1,8 @@
 {
   "ExpandedNodes": [
     "",
-    "\\RoadDetection",
-    "\\test",
-    "\\test\\CarsDetection"
+    "\\PedestransCarsDetection",
+    "\\RoadDetection"
   ],
   "SelectedNode": "\\RoadDetection\\AICam3.py",
   "PreviewInSolutionExplorer": false
