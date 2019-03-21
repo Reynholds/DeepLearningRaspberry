@@ -2,18 +2,18 @@ import numpy as np
 import cv2 as cv
 import time
 
-
-# dotted rectangle https://stackoverflow.com/questions/26690932/opencv-rectangle-with-dotted-or-dashed-lines 
-
-
 # Load the Model 
-net = cv.dnn.readNet('person-vehicle-bike-detection-crossroad-0078.xml', 'person-vehicle-bike-detection-crossroad-0078.bin')
+net = cv.dnn.readNet('pedestrian-and-vehicle-detector-adas-0001.xml', 'pedestrian-and-vehicle-detector-adas-0001.bin')
 
 # Specify target device
 net.setPreferableTarget(cv.dnn.DNN_TARGET_MYRIAD)
 
 # Read an image
 cap = cv.VideoCapture(0)
+
+#image dimension
+width = 1280
+heigh = 640
 
 #image dimension
 width = 1280
@@ -36,7 +36,7 @@ while(True):
     ret, frame = cap.read()
 
     # Prepare input blob and perform an inference
-    blob = cv.dnn.blobFromImage(frame, size=(1024,1024), ddepth=cv.CV_8U)
+    blob = cv.dnn.blobFromImage(frame, size=(672, 384), ddepth=cv.CV_8U)
     net.setInput(blob)
     out= net.forward()
 
@@ -55,7 +55,7 @@ while(True):
            cv.rectangle(frame, (xmin, ymin), (xmax, ymax), ColorDetection[2], thickness=2)
         elif confidence > 0.15 :
            cv.rectangle(frame,(xmin, ymin) , (xmax, ymax), ColorDetection[3], thickness=1)
-
+   
 
     # resize the image
     frame = cv.resize(frame,(width,heigh))
@@ -66,9 +66,9 @@ while(True):
 
     # Time elapsed
     seconds = end - start
-    fps = 1 / seconds 
+    fps = 1 / seconds
 
-    cv.putText(frame, "FPS : {0:.2f} ".format(fps), (30,30), cv.FONT_HERSHEY_COMPLEX, 1, (0,0,0), thickness = 1)
+    cv.putText(frame, "FPS : {0:.2f} ".format(fps), (30,30), cv.FONT_HERSHEY_COMPLEX, 1, (0,0,0))
     
 
     # Display the resulting frame
@@ -79,5 +79,3 @@ while(True):
 # When everything done, release the capture
 cap.release()
 cv.destroyAllWindows()
-
-
