@@ -7,7 +7,7 @@ import time
 
 
 # Load the Model 
-net = cv.dnn.readNet('person-vehicle-bike-detection-crossroad-0078.xml', 'person-vehicle-bike-detection-crossroad-0078.bin')
+net = cv.dnn.readNet('person-vehicle-bike-detection-crossroad-0078-FP32.xml', 'person-vehicle-bike-detection-crossroad-0078-FP32.bin')
 
 # Specify target device
 net.setPreferableTarget(cv.dnn.DNN_TARGET_MYRIAD)
@@ -50,7 +50,7 @@ while(True):
 
         if confidence > 0.6 :
            cv.rectangle(frame, (xmin, ymin), (xmax, ymax), ColorDetection[int(detection[1])], thickness=5)
-           #print("ID {0} , label : {1} - {2}, confidence : {3:.2f} ".format(detection[0], detection[1], label[int(detection[1])], detection[2]*100)) 
+          # print("ID {0} , label : {1} - {2}, confidence : {3:.2f} ".format(detection[0], detection[1], label[int(detection[1])], detection[2]*100)) 
         elif confidence > 0.35 :
            cv.rectangle(frame, (xmin, ymin), (xmax, ymax), ColorDetection[int(detection[1])], thickness=2)
         elif confidence > 0.15 :
