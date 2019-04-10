@@ -13,7 +13,7 @@ net = cv.dnn.readNet('person-vehicle-bike-detection-crossroad-0078-FP32.xml', 'p
 net.setPreferableTarget(cv.dnn.DNN_TARGET_MYRIAD)
 
 # Read an image
-cap = cv.VideoCapture(0)
+cap = cv.VideoCapture('../Get clip/Capture20190404_104457.mp4')
 
 #image dimension
 width = 1280

@@ -22,10 +22,10 @@ request_base = cam_protocol+cam_user+":"+cam_password+"@"+cam_address
 #1 Change content to Get SD_List Folder
 r = requests.get(request_base+url_getFolderVideo)
 print ("#### Change Content to get FolderVideo ####")
-print(r.text)
+#print(r.text)
 r = requests.get(request_base+url_getContent)
 print ("#### Show Content to get FolderVideo ####")
-print(r.text)
+#print(r.text)
 m = re.search(regexSearch, r.text)
 if m:
        found=m.group(1)
@@ -38,10 +38,10 @@ if m:
 #2 - For finding folder get the time folder in here
 r = requests.get(request_base+url_getFolderVideoDate+miningFolderDateFound[0])
 print ("#### Change Content to get FolderVideobyHour ####")
-print(r.text)
+#print(r.text)
 r = requests.get(request_base+url_getContent)
 print ("#### Show Content to get FolderVideobyHour ####")
-print(r.text)
+#print(r.text)
 m = re.search(regexSearch, r.text)
 if m:
        found=m.group(1)
@@ -54,10 +54,10 @@ if m:
 #3 - For finding folder hour get the files in here
 r = requests.get(request_base+url_getFolderVideoDate+miningFolderDateFound[0]+"/"+miningFolderFileVideo[0])
 print ("#### Change Content to get FolderVideoDateHourFile ####")
-print(r.text)
+#print(r.text)
 r = requests.get(request_base+url_getContent)
 print ("#### Show Content to get FolderVideoDateHourFile ####")
-print(r.text)
+#print(r.text)
 m = re.search(regexSearchFile, r.text)
 if m:
        found=m.group(1)
