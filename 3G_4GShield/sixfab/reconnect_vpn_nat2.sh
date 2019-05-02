@@ -17,6 +17,9 @@ while true; do
 		#sudo ip route flush table main
 		sudo route add 13.81.175.81 gw 10.64.64.64
 		sudo ip route add 10.64.0.0/16 dev ppp0
+		sudo route del -net 192.168.235.0 gw 0.0.0.0 netmask 255.255.255.0 dev eth
+0
+		sudo route add  192.168.235.99 dev eth0
 		
 	fi
 	
