@@ -1,7 +1,9 @@
 #!/bin/sh
 
+echo "Execution de reconnect.sh"
+
 ROUTE_STATE=0
-echo $ROUTE_STATE
+
 
 while true; do
 	echo "\n\n >>> test 3G-4G <<< "
@@ -22,25 +24,29 @@ while true; do
 	ping -I tun0 -c 1 8.8.8.8
 		if [ $? -eq 0 ]; then
 			echo "VPN connected"
+			
+			echo "\n\n >>> Test Route : $ROUTE_STATE <<<"
+			if [ "$ROUTE_STATE" -eq 0 ]; then
+				echo "Adding route to NAT the camera"
+				sudo iptables -t nat -F
+				sleep 1
+				sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -i tun0 -j DNAT --to 192.168.235.99:80
+				sudo sysctl -w net.ipv4.ip_forward=1
+				sudo iptables -t nat -A POSTROUTING -o tun0 -j MASQUERADE
+				ROUTE_STATE=1
+				echo "Route updated !"
+			else
+				echo "Route is set"
+			fi
 		else
 			echo "Connection to VPN in progress"
 			sudo openvpn --config "/home/pi/RREI/OpenVPN/client Caméra.ovpn"
-			
+			ROUTE_STATE=0
+			sudo sysctl -w net.ipv4.ip_forward=1			
 		fi
 
-	echo "\n\n >>> Test Route : $ROUTE_STATE <<<"
-		if [ "$ROUTE_STATE" -eq 0 ]; then
-			echo "Adding route to NAT the camera"
-			sudo iptables -F
-			sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -i tun0 -j DNAT --to 192.168.235.99:80
-			sudo sysctl -w net.ipv4.ip_forward=1
-			sudo iptables -t nat -A POSTROUTING -o tun0 -j MASQUERADE
-			ROUTE_STATE=1
-		else
-			echo "Route is set"
-		fi
 			
 
-	sleep 1
+	sleep 5
 done
 
