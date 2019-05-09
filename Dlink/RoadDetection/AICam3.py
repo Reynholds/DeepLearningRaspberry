@@ -13,11 +13,18 @@ net = cv.dnn.readNet('person-vehicle-bike-detection-crossroad-0078-FP32.xml', 'p
 net.setPreferableTarget(cv.dnn.DNN_TARGET_MYRIAD)
 
 # Read an image
-cap = cv.VideoCapture('../Get clip/Capture20190404_104457.mp4')
+cap = cv.VideoCapture('/home/pi/FTPClip20190507_160424.mp4')
 
 #image dimension
 width = 1280
 heigh = 640
+
+#Setting the frame jump
+time_length = cap.get(7)/cap.get(5)
+number_frames= cap.get(7)
+fps = cap.get(5)
+frame_jump = 15
+frame_seq = - frame_jump
 
 blue = (255,0,0)
 green = (0,255,0)
@@ -32,9 +39,23 @@ ColorDetection =[blue, green, red, white, black]
 while(True):
     # Start time
     start = time.time() 
-    # Capture frame-by-frame
-    ret, frame = cap.read()
+    
+    # Get a specific number of frame
 
+    frame_seq += frame_jump 
+    frame_no = (frame_seq /number_frames)
+    
+    #for i in range(18):
+    #    print ("cap.get({0})={1}".format(i,cap.get(i)))
+    
+    print ("frame n° {0}/{1} -> frame_no = {2} at {3}".format(frame_seq,number_frames,frame_no,cap.get(0)/1000)) 
+    cap.set(1,frame_seq)
+    
+    
+    # Capture specific frame
+    ret, frame = cap.read()
+    
+    
     # Prepare input blob and perform an inference
     blob = cv.dnn.blobFromImage(frame, size=(1024,1024), ddepth=cv.CV_8U)
     net.setInput(blob)
