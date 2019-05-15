@@ -5,6 +5,14 @@ import time
 import datetime
 import uuid, sys
 from azure.storage.blob import BlockBlobService, PublicAccess
+import logging
+
+#LOG_LEVEL = logging.DEBUG
+LOG_LEVEL = logging.INFO
+LOG_FILE = "/var/log/SendToAzureLog"
+LOG_FORMAT ="%(asctime)s %(levelname)s %(message)s"
+logging.basicConfig(filename=LOG_FILE, format=LOG_FORMAT, level=LOG_LEVEL)
+
 
 video_prefix = "FTPClip"
 
@@ -47,7 +55,7 @@ def run_sample(full_path_to_file):
 
         print("Temp file = " + full_path_to_file)
         print("\nUploading to Blob storage as blob " + local_file_name)
-		
+        logging.info("Uploading {0}, to container {1}\\{2}\\{3}\\{4}".format(local_file_name, year, month, day, hour))
 		
 
         # Upload the created file, use local_file_name for the blob name
@@ -61,12 +69,13 @@ def run_sample(full_path_to_file):
                 print(e)
         os.rename(full_path_to_file, full_path_to_file.replace(video_prefix,"sended/"+video_prefix))
         print("{0} Move to sended\n".format(local_file_name))
-         
+        logging.info("{} move to /sended\n".format(local_file_name))
+
     except Exception as e:
         print(e)
 
 
-path = os.getcwd()
+path ="/home/pi/Camera" #os.getcwd()
 
 
 files = []
@@ -83,15 +92,12 @@ for file in files_in_dir :
             files.append(os.path.join(path, file))
 
             
-print ("\n {0}\t{1} files to send\n".format(str(datetime.datetime.now()),len(files)))
+print ("\n{0}\t{1} files to send\n".format(str(datetime.datetime.now()),len(files)))
+logging.info(("\n{0}\t{1} files to send\n".format(str(datetime.datetime.now()),len(files))))
 
 for f in files:
     #print(f)
     filename = right(f, len(f) - f.rfind(video_prefix))
     print(filename)
     run_sample(f)
-
-#Sleep for 60 seconds
-print ("Sleep for 60 seconds")
-
 

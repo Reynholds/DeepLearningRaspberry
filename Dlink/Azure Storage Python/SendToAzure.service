@@ -1,0 +1,15 @@
+[Unit]
+Description = Autonomous sending video to azure Service (RREI)
+#After = multi-user.target
+
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /home/pi/Camera/SendToAzure.py > /home/pi/Camera/SendToAzure.log 2>&1
+WorkingDirectory=/home/pi/Camera/
+#StandardOutput=inherit
+StandardError=inherit
+User=pi
+
+[Install]
+WantedBy=timers.target

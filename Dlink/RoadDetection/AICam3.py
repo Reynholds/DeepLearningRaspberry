@@ -1,9 +1,33 @@
 import numpy as np
 import cv2 as cv
 import time
+import datetime
+import csv
+
+def left(s, amount):
+    return s[:amount]
+
+def right(s, amount):
+    return s[-amount:]
+
+def mid(s, offset, amount):
+    return s[offset:offset+amount]
 
 
 # dotted rectangle https://stackoverflow.com/questions/26690932/opencv-rectangle-with-dotted-or-dashed-lines 
+
+video_prefix = "FTPClip"
+file_full_name = '/home/pi/Camera/sended/FTPClip20190511_144822.mp4'
+filename =  right(file_full_name, len(file_full_name) - file_full_name.rfind(video_prefix))
+year  = int(mid(filename, len(video_prefix), 4))
+month = int(mid(filename, len(video_prefix) +4, 2))
+day   = int(mid(filename, len(video_prefix) +4 +2, 2))
+hour  = int(mid(filename, len(video_prefix) +4 +2 +2 +1, 2))
+minute= int(mid(filename, len(video_prefix) +4 +2 +2 +1 +2, 2))
+second= int(mid(filename, len(video_prefix) +4 +2 +2 +1 +2 +2, 2))
+
+#print("{}-{}-{} {}:{}:{}".format(int(year),int(month), int(day), int(hour), int(minute), int(second)))
+#print("{}-{}-{} {}:{}:{}".format(year,month, day, hour, minute, second))
 
 
 # Load the Model 
@@ -13,7 +37,7 @@ net = cv.dnn.readNet('person-vehicle-bike-detection-crossroad-0078-FP32.xml', 'p
 net.setPreferableTarget(cv.dnn.DNN_TARGET_MYRIAD)
 
 # Read an image
-cap = cv.VideoCapture('/home/pi/FTPClip20190507_160424.mp4')
+cap = cv.VideoCapture(file_full_name)
 
 #image dimension
 width = 1280
@@ -23,7 +47,7 @@ heigh = 640
 time_length = cap.get(7)/cap.get(5)
 number_frames= cap.get(7)
 fps = cap.get(5)
-frame_jump = 15
+frame_jump = 25
 frame_seq = - frame_jump
 
 blue = (255,0,0)
@@ -32,9 +56,14 @@ red = (0,0,255)
 white = (255,255,255)
 black = (0,0,0)
 
-label = ("Vehicule","Pieton","Vélo")
+label = ("Pieton", "Vélo", "Voiture")
 
 ColorDetection =[blue, green, red, white, black]
+
+#Create csv file
+#with open(file_full_name.replace(".mp4",".csv", 'wb')) as csvfile:
+#	filewriter = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+
 
 while(True):
     # Start time
@@ -44,11 +73,14 @@ while(True):
 
     frame_seq += frame_jump 
     frame_no = (frame_seq /number_frames)
+    if frame_seq > number_frames :
+        break
+    
     
     #for i in range(18):
     #    print ("cap.get({0})={1}".format(i,cap.get(i)))
     
-    print ("frame n° {0}/{1} -> frame_no = {2} at {3}".format(frame_seq,number_frames,frame_no,cap.get(0)/1000)) 
+    print ("{4} : frame n°{0}/{1} -> frame_no = {2} at {3}".format(frame_seq,number_frames,frame_no,cap.get(0)/1000, datetime.datetime.now()) ) 
     cap.set(1,frame_seq)
     
     
@@ -68,8 +100,11 @@ while(True):
         ymin = int(detection[4] * frame.shape[0])
         xmax = int(detection[5] * frame.shape[1])
         ymax = int(detection[6] * frame.shape[0])
-
-        if confidence > 0.6 :
+     
+     
+        if confidence > 0.6 :        
+          #Ecriture au format : ['frame':3, 'detection':'voiture', 'confiance':50, 'horodatage':'2019-05-14 13:45:59', position:[xmin=0,ymin=0,xmax=5,ymax=5]]
+           print("['frame':{0}, 'detection':'{1}' 'confiance':{2}, 'horodatage':'{3}', position:['xmin'={4},'ymin'={5},'xmax'={6},'ymax'={7}]]".format(frame_no, label[int(detection[1])], detection[2]*100, datetime.datetime.fromtimestamp(cap.get(0)/1000  + datetime.datetime(year, month, day, hour, minute, second, 0).timestamp()) , detection[3]* frame.shape[1],detection[4]* frame.shape[0],detection[5]* frame.shape[1],detection[6]* frame.shape[0]))
            cv.rectangle(frame, (xmin, ymin), (xmax, ymax), ColorDetection[int(detection[1])], thickness=5)
           # print("ID {0} , label : {1} - {2}, confidence : {3:.2f} ".format(detection[0], detection[1], label[int(detection[1])], detection[2]*100)) 
         elif confidence > 0.35 :
@@ -79,7 +114,7 @@ while(True):
 
 
     # resize the image
-    frame = cv.resize(frame,(width,heigh))
+    #frame = cv.resize(frame,(width,heigh))
 
 
     #end time
@@ -89,11 +124,11 @@ while(True):
     seconds = end - start
     fps = 1 / seconds 
 
-    cv.putText(frame, "FPS : {0:.2f} ".format(fps), (30,30), cv.FONT_HERSHEY_COMPLEX, 1, (0,0,0), thickness = 1)
+    #cv.putText(frame, "FPS : {0:.2f} ".format(fps), (30,30), cv.FONT_HERSHEY_COMPLEX, 1, (0,0,0), thickness = 1)
     
 
     # Display the resulting frame
-    cv.imshow('AI Cam', frame)
+    #cv.imshow('AI Cam', frame)
     if cv.waitKey(1) & 0xFF == ord('q'):
         break
 

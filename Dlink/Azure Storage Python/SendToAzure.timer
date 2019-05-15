@@ -1,0 +1,8 @@
+[Unit]
+Description = Autonomous sending video to azure Service (RREI)
+After = multi-user.target
+
+[Timer]
+OnBootSec=2minutes
+OnUnitActiveSec=1minutes
+
