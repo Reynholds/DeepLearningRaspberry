@@ -2,7 +2,6 @@ import numpy as np
 import cv2 as cv
 import time
 import datetime
-import csv
 
 def left(s, amount):
     return s[:amount]
@@ -17,7 +16,7 @@ def mid(s, offset, amount):
 # dotted rectangle https://stackoverflow.com/questions/26690932/opencv-rectangle-with-dotted-or-dashed-lines 
 
 video_prefix = "FTPClip"
-file_full_name = '/home/pi/Camera/sended/FTPClip20190511_144822.mp4'
+file_full_name = '/home/pi/Camera/sended/FTPClip20190511_144507.mp4'
 filename =  right(file_full_name, len(file_full_name) - file_full_name.rfind(video_prefix))
 year  = int(mid(filename, len(video_prefix), 4))
 month = int(mid(filename, len(video_prefix) +4, 2))
@@ -47,7 +46,7 @@ heigh = 640
 time_length = cap.get(7)/cap.get(5)
 number_frames= cap.get(7)
 fps = cap.get(5)
-frame_jump = 25
+frame_jump = 20
 frame_seq = - frame_jump
 
 blue = (255,0,0)
@@ -60,9 +59,12 @@ label = ("Pieton", "Vélo", "Voiture")
 
 ColorDetection =[blue, green, red, white, black]
 
-#Create csv file
-#with open(file_full_name.replace(".mp4",".csv", 'wb')) as csvfile:
-#	filewriter = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+
+start_datetime = datetime.datetime.now()
+
+#Create output file
+txt_file = open(file_full_name.replace(".mp4",".txt"), 'w+')
+txt_file.write('{{\n  "record": {{\n    "time_length" : {0},\n    "fps": {1},\n    "frame_jump" : {2},\n    "width" : {3},\n    "heigh" : {4},\n    "start_time" : "{5}",\n    "detections" :[\n'.format(time_length, fps, frame_jump, width, heigh, start_datetime))
 
 
 while(True):
@@ -70,29 +72,24 @@ while(True):
     start = time.time() 
     
     # Get a specific number of frame
-
     frame_seq += frame_jump 
     frame_no = (frame_seq /number_frames)
     if frame_seq > number_frames :
         break
-    
-    
-    #for i in range(18):
-    #    print ("cap.get({0})={1}".format(i,cap.get(i)))
-    
-    print ("{4} : frame n°{0}/{1} -> frame_no = {2} at {3}".format(frame_seq,number_frames,frame_no,cap.get(0)/1000, datetime.datetime.now()) ) 
     cap.set(1,frame_seq)
     
     
     # Capture specific frame
     ret, frame = cap.read()
     
-    
+    print ("{4} : frame n°{0}/{1} -> frame_no = {2} at {3}".format(frame_seq,number_frames,frame_no,cap.get(0)/1000, datetime.datetime.now()) )     
     # Prepare input blob and perform an inference
     blob = cv.dnn.blobFromImage(frame, size=(1024,1024), ddepth=cv.CV_8U)
     net.setInput(blob)
+    ## RREI Note : 1er lancement de cette instruction longue
     out= net.forward()
-
+    
+    
     # Draw detected faces on the frame
     for detection in out.reshape(-1, 7):
         confidence = float(detection[2])
@@ -102,15 +99,15 @@ while(True):
         ymax = int(detection[6] * frame.shape[0])
      
      
-        if confidence > 0.6 :        
+        if confidence > 0.5 :        
           #Ecriture au format : ['frame':3, 'detection':'voiture', 'confiance':50, 'horodatage':'2019-05-14 13:45:59', position:[xmin=0,ymin=0,xmax=5,ymax=5]]
-           print("['frame':{0}, 'detection':'{1}' 'confiance':{2}, 'horodatage':'{3}', position:['xmin'={4},'ymin'={5},'xmax'={6},'ymax'={7}]]".format(frame_no, label[int(detection[1])], detection[2]*100, datetime.datetime.fromtimestamp(cap.get(0)/1000  + datetime.datetime(year, month, day, hour, minute, second, 0).timestamp()) , detection[3]* frame.shape[1],detection[4]* frame.shape[0],detection[5]* frame.shape[1],detection[6]* frame.shape[0]))
-           cv.rectangle(frame, (xmin, ymin), (xmax, ymax), ColorDetection[int(detection[1])], thickness=5)
-          # print("ID {0} , label : {1} - {2}, confidence : {3:.2f} ".format(detection[0], detection[1], label[int(detection[1])], detection[2]*100)) 
+           print("{{'frame':{0}, 'detection':'{1}' 'confiance':{2}, 'horodatage':'{3}', position:['xmin':{4},'ymin':{5},'xmax':{6},'ymax':{7}]}}\n".format(frame_no*number_frames, label[int(detection[1])], detection[2]*100, datetime.datetime.fromtimestamp(cap.get(0)/1000  + datetime.datetime(year, month, day, hour, minute, second, 0).timestamp()) , detection[3]* frame.shape[1],detection[4]* frame.shape[0],detection[5]* frame.shape[1],detection[6]* frame.shape[0]))
+           txt_file.write('        {{"frame":{0}, "detection":"{1}", "confiance":{2}, "horodatage":"{3}", "position":{{"xmin":{4},"ymin":{5},"xmax":{6},"ymax":{7}}}}},\n'.format(frame_no*number_frames, label[int(detection[1])], detection[2]*100, datetime.datetime.fromtimestamp(cap.get(0)/1000  + datetime.datetime(year, month, day, hour, minute, second, 0).timestamp()) , detection[3]* frame.shape[1],detection[4]* frame.shape[0],detection[5]* frame.shape[1],detection[6]* frame.shape[0]))
+           #cv.rectangle(frame, (xmin, ymin), (xmax, ymax), ColorDetection[int(detection[1])], thickness=5)
         elif confidence > 0.35 :
-           cv.rectangle(frame, (xmin, ymin), (xmax, ymax), ColorDetection[int(detection[1])], thickness=2)
+           #cv.rectangle(frame, (xmin, ymin), (xmax, ymax), ColorDetection[int(detection[1])], thickness=2)
         elif confidence > 0.15 :
-           cv.rectangle(frame,(xmin, ymin) , (xmax, ymax), ColorDetection[int(detection[1])], thickness=1)
+           #cv.rectangle(frame,(xmin, ymin) , (xmax, ymax), ColorDetection[int(detection[1])], thickness=1)
 
 
     # resize the image
@@ -134,6 +131,10 @@ while(True):
 
 # When everything done, release the capture
 cap.release()
+end_datetime = datetime.datetime.now()
+duration = divmod((end_datetime- start_datetime).total_seconds(), 60)
+txt_file.write('        {{"EndOfDetections":true}}],\n    "end_time":"{}",\n    "duration":"{}"\n }} \n}}'.format(datetime.datetime.now(), duration))   
+txt_file.close()
 cv.destroyAllWindows()
 
 
